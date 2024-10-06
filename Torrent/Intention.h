@@ -16,13 +16,8 @@
 
 #pragma once
 
-struct Intention
-{
-    enum Enum
-    {
-        Export,
-        Import
-    };
+struct Intention {
+    enum Enum { Export, Import };
 
     //
 };

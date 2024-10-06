@@ -23,11 +23,10 @@
 typedef std::unique_ptr<std::istream> IReadStreamPtr;
 typedef std::unique_ptr<std::ostream> IWriteStreamPtr;
 
-class IFileStreamProvider
-{
-public:
+class IFileStreamProvider {
+   public:
     virtual ~IFileStreamProvider() noexcept(false);
 
-    virtual IReadStreamPtr GetReadStream(std::filesystem::path const& path) const = 0;
-    virtual IWriteStreamPtr GetWriteStream(std::filesystem::path const& path) = 0;
+    virtual IReadStreamPtr GetReadStream(std::filesystem::path const &path) const = 0;
+    virtual IWriteStreamPtr GetWriteStream(std::filesystem::path const &path) = 0;
 };

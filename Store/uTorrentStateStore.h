@@ -18,20 +18,18 @@
 
 #include "ITorrentStateStore.h"
 
-class uTorrentStateStore : public ITorrentStateStore
-{
-public:
+class uTorrentStateStore : public ITorrentStateStore {
+   public:
     uTorrentStateStore();
     ~uTorrentStateStore() override;
 
-public:
+   public:
     // ITorrentStateStore
     TorrentClient::Enum GetTorrentClient() const override;
 
     std::filesystem::path GuessDataDir(Intention::Enum intention) const override;
-    bool IsValidDataDir(std::filesystem::path const& dataDir, Intention::Enum intention) const override;
+    bool IsValidDataDir(std::filesystem::path const &dataDir, Intention::Enum intention) const override;
 
-    ITorrentStateIteratorPtr Export(std::filesystem::path const& dataDir,
-        IFileStreamProvider const& fileStreamProvider) const override;
-    void Import(std::filesystem::path const& dataDir, Box const& box, IFileStreamProvider& fileStreamProvider) const override;
+    ITorrentStateIteratorPtr Export(std::filesystem::path const &dataDir, IFileStreamProvider const &fileStreamProvider) const override;
+    void Import(std::filesystem::path const &dataDir, Box const &box, IFileStreamProvider &fileStreamProvider) const override;
 };

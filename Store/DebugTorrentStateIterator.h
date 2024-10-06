@@ -16,20 +16,18 @@
 
 #pragma once
 
+#include "Common/IForwardIterator.h"
 #include "ITorrentStateStore.h"
 
-#include "Common/IForwardIterator.h"
-
-class DebugTorrentStateIterator : public ITorrentStateIterator
-{
-public:
+class DebugTorrentStateIterator : public ITorrentStateIterator {
+   public:
     DebugTorrentStateIterator(ITorrentStateIteratorPtr decoratee);
     ~DebugTorrentStateIterator() override;
 
-public:
+   public:
     // ITorrentStateIterator
-    bool GetNext(Box& nextBox) override;
+    bool GetNext(Box &nextBox) override;
 
-private:
+   private:
     ITorrentStateIteratorPtr const m_decoratee;
 };

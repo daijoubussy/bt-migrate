@@ -19,23 +19,21 @@
 #include <exception>
 #include <string>
 
-class Exception : public std::exception
-{
-public:
-    explicit Exception(std::string const& message);
+class Exception : public std::exception {
+   public:
+    explicit Exception(std::string const &message);
     ~Exception() override;
 
-public:
+   public:
     // std::exception
-    char const* what() const noexcept override;
+    char const *what() const noexcept override;
 
-private:
+   private:
     std::string const m_message;
 };
 
-class NotImplementedException : public Exception
-{
-public:
-    explicit NotImplementedException(std::string const& place);
+class NotImplementedException : public Exception {
+   public:
+    explicit NotImplementedException(std::string const &place);
     ~NotImplementedException() override;
 };

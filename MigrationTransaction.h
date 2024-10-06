@@ -16,31 +16,30 @@
 
 #pragma once
 
-#include "Common/IFileStreamProvider.h"
-
 #include <filesystem>
 #include <mutex>
 #include <set>
 #include <string>
 
-class MigrationTransaction : public IFileStreamProvider
-{
-public:
+#include "Common/IFileStreamProvider.h"
+
+class MigrationTransaction : public IFileStreamProvider {
+   public:
     MigrationTransaction(bool writeThrough, bool dryRun);
     ~MigrationTransaction() noexcept(false) override;
 
     void Commit();
 
-public:
+   public:
     // IFileStreamProvider
-    IReadStreamPtr GetReadStream(std::filesystem::path const& path) const override;
-    IWriteStreamPtr GetWriteStream(std::filesystem::path const& path) override;
+    IReadStreamPtr GetReadStream(std::filesystem::path const &path) const override;
+    IWriteStreamPtr GetWriteStream(std::filesystem::path const &path) override;
 
-private:
-    std::filesystem::path GetTemporaryPath(std::filesystem::path const& path) const;
-    std::filesystem::path GetBackupPath(std::filesystem::path const& path) const;
+   private:
+    std::filesystem::path GetTemporaryPath(std::filesystem::path const &path) const;
+    std::filesystem::path GetBackupPath(std::filesystem::path const &path) const;
 
-private:
+   private:
     bool const m_writeThrough;
     bool const m_dryRun;
     std::string const m_transactionId;

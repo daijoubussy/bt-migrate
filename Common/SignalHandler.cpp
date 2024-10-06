@@ -18,32 +18,21 @@
 
 #include <csignal>
 
-namespace
-{
+namespace {
 
-volatile std::sig_atomic_t SignalStatus = 0;
+    volatile std::sig_atomic_t SignalStatus = 0;
 
-void HandleSignal(int signal)
-{
-    SignalStatus = signal;
-}
+    void HandleSignal(int signal) { SignalStatus = signal; }
 
-} // namespace
+}  // namespace
 
-SignalHandler::SignalHandler() :
-    m_oldIntHandler(std::signal(SIGINT, &HandleSignal)),
-    m_oldTermHandler(std::signal(SIGTERM, &HandleSignal))
-{
+SignalHandler::SignalHandler() : m_oldIntHandler(std::signal(SIGINT, &HandleSignal)), m_oldTermHandler(std::signal(SIGTERM, &HandleSignal)) {
     //
 }
 
-SignalHandler::~SignalHandler()
-{
+SignalHandler::~SignalHandler() {
     std::signal(SIGTERM, m_oldTermHandler);
     std::signal(SIGINT, m_oldIntHandler);
 }
 
-bool SignalHandler::IsInterrupted() const
-{
-    return SignalStatus != 0;
-}
+bool SignalHandler::IsInterrupted() const { return SignalStatus != 0; }

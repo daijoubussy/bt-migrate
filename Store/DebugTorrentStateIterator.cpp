@@ -18,27 +18,24 @@
 
 #include "Torrent/Box.h"
 
-template<typename StreamT>
-StreamT& operator << (StreamT& stream, TorrentInfo const& value)
-{
+template <typename StreamT>
+StreamT &operator<<(StreamT &stream, TorrentInfo const &value) {
     stream << "(" << value.GetInfoHash() << ")";
     return stream;
 }
 
-template<typename StreamT>
-StreamT& operator << (StreamT& stream, Box::LimitInfo const& value)
-{
-    switch (value.Mode)
-    {
-    case Box::LimitMode::Inherit:
-        stream << "Inherit";
-        break;
-    case Box::LimitMode::Enabled:
-        stream << "Enabled";
-        break;
-    case Box::LimitMode::Disabled:
-        stream << "Disabled";
-        break;
+template <typename StreamT>
+StreamT &operator<<(StreamT &stream, Box::LimitInfo const &value) {
+    switch (value.Mode) {
+        case Box::LimitMode::Inherit:
+            stream << "Inherit";
+            break;
+        case Box::LimitMode::Enabled:
+            stream << "Enabled";
+            break;
+        case Box::LimitMode::Disabled:
+            stream << "Disabled";
+            break;
     }
 
     stream << "/" << value.Value;
@@ -46,29 +43,20 @@ StreamT& operator << (StreamT& stream, Box::LimitInfo const& value)
     return stream;
 }
 
-template<typename StreamT>
-StreamT& operator << (StreamT& stream, Box::FileInfo const& value)
-{
-    stream <<
-        "(" <<
-        std::boolalpha << value.DoNotDownload << "/" <<
-        value.Priority << "/" <<
-        value.Path <<
-        ")";
+template <typename StreamT>
+StreamT &operator<<(StreamT &stream, Box::FileInfo const &value) {
+    stream << "(" << std::boolalpha << value.DoNotDownload << "/" << value.Priority << "/" << value.Path << ")";
 
     return stream;
 }
 
-template<typename StreamT, typename T>
-StreamT& operator << (StreamT& stream, std::vector<T> const& value)
-{
+template <typename StreamT, typename T>
+StreamT &operator<<(StreamT &stream, std::vector<T> const &value) {
     stream << '[';
 
     bool first = true;
-    for (T const& x : value)
-    {
-        if (!first)
-        {
+    for (T const &x : value) {
+        if (!first) {
             stream << ", ";
         }
 
@@ -80,11 +68,9 @@ StreamT& operator << (StreamT& stream, std::vector<T> const& value)
     return stream;
 }
 
-template<typename StreamT>
-StreamT& operator << (StreamT& stream, std::vector<bool> const& value)
-{
-    for (bool const x : value)
-    {
+template <typename StreamT>
+StreamT &operator<<(StreamT &stream, std::vector<bool> const &value) {
+    for (bool const x : value) {
         stream << (x ? '#' : '-');
     }
 
@@ -94,37 +80,60 @@ StreamT& operator << (StreamT& stream, std::vector<bool> const& value)
 // Including after operator declarations so that lookup works
 #include "Common/Logger.h"
 
-DebugTorrentStateIterator::DebugTorrentStateIterator(ITorrentStateIteratorPtr decoratee) :
-    m_decoratee(std::move(decoratee))
-{
+DebugTorrentStateIterator::DebugTorrentStateIterator(ITorrentStateIteratorPtr decoratee) : m_decoratee(std::move(decoratee)) {
     //
 }
 
 DebugTorrentStateIterator::~DebugTorrentStateIterator() = default;
 
-bool DebugTorrentStateIterator::GetNext(Box& nextBox)
-{
-    if (!m_decoratee->GetNext(nextBox))
-    {
+bool DebugTorrentStateIterator::GetNext(Box &nextBox) {
+    if (!m_decoratee->GetNext(nextBox)) {
         return false;
     }
 
-    Logger(Logger::Debug) <<
-        "Torrent=" << nextBox.Torrent << " "
-        "AddedAt=" << nextBox.AddedAt << " "
-        "CompletedAt=" << nextBox.CompletedAt << " "
-        "IsPaused=" << std::boolalpha << nextBox.IsPaused << " "
-        "DownloadedSize=" << nextBox.DownloadedSize << " "
-        "UploadedSize=" << nextBox.UploadedSize << " "
-        "CorruptedSize=" << nextBox.CorruptedSize << " "
-        "SavePath=" << nextBox.SavePath << " "
-        "BlockSize=" << nextBox.BlockSize << " "
-        "RatioLimit=" << nextBox.RatioLimit << " "
-        "DownloadSpeedLimit=" << nextBox.DownloadSpeedLimit << " "
-        "UploadSpeedLimit=" << nextBox.UploadSpeedLimit << " "
-        "Files<" << nextBox.Files.size() << ">=" << nextBox.Files << " "
-        "ValidBlocks<" << nextBox.ValidBlocks.size() << ">=" << nextBox.ValidBlocks << " "
-        "Trackers<" << nextBox.Trackers.size() << ">=" << nextBox.Trackers;
+    Logger(Logger::Debug) << "Torrent=" << nextBox.Torrent
+                          << " "
+                             "AddedAt="
+                          << nextBox.AddedAt
+                          << " "
+                             "CompletedAt="
+                          << nextBox.CompletedAt
+                          << " "
+                             "IsPaused="
+                          << std::boolalpha << nextBox.IsPaused
+                          << " "
+                             "DownloadedSize="
+                          << nextBox.DownloadedSize
+                          << " "
+                             "UploadedSize="
+                          << nextBox.UploadedSize
+                          << " "
+                             "CorruptedSize="
+                          << nextBox.CorruptedSize
+                          << " "
+                             "SavePath="
+                          << nextBox.SavePath
+                          << " "
+                             "BlockSize="
+                          << nextBox.BlockSize
+                          << " "
+                             "RatioLimit="
+                          << nextBox.RatioLimit
+                          << " "
+                             "DownloadSpeedLimit="
+                          << nextBox.DownloadSpeedLimit
+                          << " "
+                             "UploadSpeedLimit="
+                          << nextBox.UploadSpeedLimit
+                          << " "
+                             "Files<"
+                          << nextBox.Files.size() << ">=" << nextBox.Files
+                          << " "
+                             "ValidBlocks<"
+                          << nextBox.ValidBlocks.size() << ">=" << nextBox.ValidBlocks
+                          << " "
+                             "Trackers<"
+                          << nextBox.Trackers.size() << ">=" << nextBox.Trackers;
 
     return true;
 }

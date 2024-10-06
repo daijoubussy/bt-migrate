@@ -18,17 +18,8 @@
 
 #include <string>
 
-struct TorrentClient
-{
-    enum Enum
-    {
-        Deluge,
-        rTorrent,
-        Transmission,
-        TransmissionMac,
-        uTorrent,
-        uTorrentWeb
-    };
+struct TorrentClient {
+    enum Enum { Deluge, rTorrent, Transmission, TransmissionMac, uTorrent, uTorrentWeb };
 
     static Enum const FirstClient = Deluge;
     static Enum const LastClient = uTorrent;

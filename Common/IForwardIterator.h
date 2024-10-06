@@ -16,11 +16,10 @@
 
 #pragma once
 
-template<typename... ArgsT>
-class IForwardIterator
-{
-public:
+template <typename... ArgsT>
+class IForwardIterator {
+   public:
     virtual ~IForwardIterator() = default;
 
-    virtual bool GetNext(ArgsT&... value) = 0;
+    virtual bool GetNext(ArgsT &...value) = 0;
 };

@@ -16,37 +16,39 @@
 
 #pragma once
 
-#include <jsoncons/json.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <iosfwd>
+#include <jsoncons/json.hpp>
 #include <string>
 
 using jsoncons::ojson;
 
 class IStructuredDataCodec;
 
-class TorrentInfo
-{
-public:
+class TorrentInfo {
+   public:
     TorrentInfo();
-    TorrentInfo(ojson const& torrent);
+    TorrentInfo(ojson const &torrent);
 
-    void Encode(std::ostream& stream, IStructuredDataCodec const& codec) const;
+    void Encode(std::ostream &stream, IStructuredDataCodec const &codec) const;
 
-    std::string const& GetInfoHash() const;
+    std::string const &GetInfoHash() const;
+    [[maybe_unused]] std::uint64_t GetIndividualSize(ojson const &file) const;
+    [[maybe_unused]] std::uint64_t GetIndividualSize(std::uint64_t const &index) const;
     std::uint64_t GetTotalSize() const;
     std::uint32_t GetPieceSize() const;
+    std::uint64_t GetNumberOfPieces() const;
     std::string GetName() const;
     std::filesystem::path GetFilePath(std::size_t fileIndex) const;
 
-    void SetTrackers(std::vector<std::vector<std::string>> const& trackers);
+    void SetTrackers(std::vector<std::vector<std::string>> const &trackers);
+    std::vector<std::vector<std::string>> GetTrackers();
 
-    static TorrentInfo Decode(std::istream& stream, IStructuredDataCodec const& codec);
+    static TorrentInfo Decode(std::istream &stream, IStructuredDataCodec const &codec);
 
-private:
+   private:
     ojson m_torrent;
     std::string m_infoHash;
 };

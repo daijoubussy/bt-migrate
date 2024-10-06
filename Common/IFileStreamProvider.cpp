@@ -1,5 +1,3 @@
 #include "IFileStreamProvider.h"
 
-IFileStreamProvider::~IFileStreamProvider() noexcept(false)
-{
-}
+IFileStreamProvider::~IFileStreamProvider() noexcept(false) {}

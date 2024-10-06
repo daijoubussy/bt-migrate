@@ -16,32 +16,27 @@
 
 #pragma once
 
-#include "IForwardIterator.h"
-
 #include <mutex>
 
-template<typename... ArgsT>
-class ThreadSafeIterator : public IForwardIterator<ArgsT...>
-{
-public:
-    ThreadSafeIterator(std::unique_ptr<IForwardIterator<ArgsT...>> decoratee) :
-        m_decoratee(std::move(decoratee)),
-        m_mutex()
-    {
+#include "IForwardIterator.h"
+
+template <typename... ArgsT>
+class ThreadSafeIterator : public IForwardIterator<ArgsT...> {
+   public:
+    ThreadSafeIterator(std::unique_ptr<IForwardIterator<ArgsT...>> decoratee) : m_decoratee(std::move(decoratee)), m_mutex() {
         //
     }
 
     ~ThreadSafeIterator() override = default;
 
-public:
+   public:
     // IForwardIterator
-    bool GetNext(ArgsT&... value) override
-    {
+    bool GetNext(ArgsT &...value) override {
         std::lock_guard<std::mutex> lock(m_mutex);
-        return m_decoratee->GetNext(std::forward<ArgsT&...>(value...));
+        return m_decoratee->GetNext(std::forward<ArgsT &...>(value...));
     }
 
-private:
+   private:
     std::unique_ptr<IForwardIterator<ArgsT...>> const m_decoratee;
     std::mutex m_mutex;
 };

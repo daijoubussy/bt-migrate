@@ -16,51 +16,44 @@
 
 #include "TorrentStateStoreFactory.h"
 
-#include "DelugeStateStore.h"
-#include "rTorrentStateStore.h"
-#include "TransmissionStateStore.h"
-#include "uTorrentStateStore.h"
-#include "uTorrentWebStateStore.h"
+#include <filesystem>
 
 #include "Common/Exception.h"
-
-#include <filesystem>
+#include "DelugeStateStore.h"
+#include "TransmissionStateStore.h"
+#include "rTorrentStateStore.h"
+#include "uTorrentStateStore.h"
+#include "uTorrentWebStateStore.h"
 
 namespace fs = std::filesystem;
 
 TorrentStateStoreFactory::TorrentStateStoreFactory() = default;
 
-ITorrentStateStorePtr TorrentStateStoreFactory::CreateForClient(TorrentClient::Enum client) const
-{
-    switch (client)
-    {
-    case TorrentClient::Deluge:
-        return std::make_unique<DelugeStateStore>();
-    case TorrentClient::rTorrent:
-        return std::make_unique<rTorrentStateStore>();
-    case TorrentClient::Transmission:
-        return std::make_unique<TransmissionStateStore>(TransmissionStateType::Generic);
-    case TorrentClient::TransmissionMac:
-        return std::make_unique<TransmissionStateStore>(TransmissionStateType::Mac);
-    case TorrentClient::uTorrent:
-        return std::make_unique<uTorrentStateStore>();
-    case TorrentClient::uTorrentWeb:
-        return std::make_unique<uTorrentWebStateStore>();
+ITorrentStateStorePtr TorrentStateStoreFactory::CreateForClient(TorrentClient::Enum client) const {
+    switch (client) {
+        case TorrentClient::Deluge:
+            return std::make_unique<DelugeStateStore>();
+        case TorrentClient::rTorrent:
+            return std::make_unique<rTorrentStateStore>();
+        case TorrentClient::Transmission:
+            return std::make_unique<TransmissionStateStore>(TransmissionStateType::Generic);
+        case TorrentClient::TransmissionMac:
+            return std::make_unique<TransmissionStateStore>(TransmissionStateType::Mac);
+        case TorrentClient::uTorrent:
+            return std::make_unique<uTorrentStateStore>();
+        case TorrentClient::uTorrentWeb:
+            return std::make_unique<uTorrentWebStateStore>();
     }
 
     throw Exception("Unknown torrent client");
 }
 
-ITorrentStateStorePtr TorrentStateStoreFactory::GuessByDataDir(fs::path const& dataDir, Intention::Enum intention) const
-{
+ITorrentStateStorePtr TorrentStateStoreFactory::GuessByDataDir(fs::path const &dataDir, Intention::Enum intention) const {
     ITorrentStateStorePtr result;
-    for (int client = TorrentClient::FirstClient; client <= TorrentClient::LastClient; ++client)
-    {
+    for (int client = TorrentClient::FirstClient; client <= TorrentClient::LastClient; ++client) {
         ITorrentStateStorePtr store = CreateForClient(static_cast<TorrentClient::Enum>(client));
-        if (store->IsValidDataDir(dataDir, intention))
-        {
-            if (result != nullptr)
-            {
+        if (store->IsValidDataDir(dataDir, intention)) {
+            if (result != nullptr) {
                 throw Exception("More than one torrent client matched data directory");
             }
 
@@ -68,8 +61,7 @@ ITorrentStateStorePtr TorrentStateStoreFactory::GuessByDataDir(fs::path const& d
         }
     }
 
-    if (result == nullptr)
-    {
+    if (result == nullptr) {
         throw Exception("No torrent client matched data directory");
     }
 

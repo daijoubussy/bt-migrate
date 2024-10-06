@@ -16,40 +16,27 @@
 
 #pragma once
 
-#include "TorrentInfo.h"
-
 #include <cstdint>
 #include <ctime>
 #include <filesystem>
 #include <string>
 #include <vector>
 
-struct Box
-{
-    enum Priority
-    {
-        MinPriority = -20,
-        NormalPriority = 0,
-        MaxPriority = 20
-    };
+#include "TorrentInfo.h"
 
-    enum struct LimitMode
-    {
-        Inherit,
-        Enabled,
-        Disabled
-    };
+struct Box {
+    enum Priority { MinPriority = -20, NormalPriority = 0, MaxPriority = 20 };
 
-    struct LimitInfo
-    {
+    enum struct LimitMode { Inherit, Enabled, Disabled };
+
+    struct LimitInfo {
         LimitMode Mode;
         double Value;
 
         LimitInfo();
     };
 
-    struct FileInfo
-    {
+    struct FileInfo {
         bool DoNotDownload;
         int Priority;
         std::filesystem::path Path;
@@ -59,6 +46,7 @@ struct Box
 
     Box();
 
+    bool Ignore;
     TorrentInfo Torrent;
     std::time_t AddedAt;
     std::time_t CompletedAt;

@@ -2,26 +2,17 @@
 
 #include <sstream>
 
-class Logger
-{
-public:
-    enum Level
-    {
-        Debug,
-        Info,
-        Warning,
-        Error
-    };
+class Logger {
+   public:
+    enum Level { Debug, Info, Warning, Error };
 
-public:
+   public:
     Logger(Level level);
     ~Logger();
 
-    template<typename T>
-    Logger& operator << (T&& value)
-    {
-        if (NeedToLog())
-        {
+    template <typename T>
+    Logger &operator<<(T &&value) {
+        if (NeedToLog()) {
             m_message << std::forward<T>(value);
         }
 
@@ -30,10 +21,10 @@ public:
 
     static void SetMinimumLevel(Level level);
 
-private:
+   private:
     bool NeedToLog() const;
 
-private:
+   private:
     Level const m_level;
     std::ostringstream m_message;
 };

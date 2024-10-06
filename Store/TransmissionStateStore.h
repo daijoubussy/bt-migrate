@@ -16,36 +16,29 @@
 
 #pragma once
 
-#include "ITorrentStateStore.h"
-
-#include "Codec/BencodeCodec.h"
-
 #include <mutex>
 
-enum class TransmissionStateType
-{
-    Generic,
-    Mac
-};
+#include "Codec/BencodeCodec.h"
+#include "ITorrentStateStore.h"
 
-class TransmissionStateStore : public ITorrentStateStore
-{
-public:
+enum class TransmissionStateType { Generic, Mac };
+
+class TransmissionStateStore : public ITorrentStateStore {
+   public:
     explicit TransmissionStateStore(TransmissionStateType stateType);
     ~TransmissionStateStore() override;
 
-public:
+   public:
     // ITorrentStateStore
     TorrentClient::Enum GetTorrentClient() const override;
 
     std::filesystem::path GuessDataDir(Intention::Enum intention) const override;
-    bool IsValidDataDir(std::filesystem::path const& dataDir, Intention::Enum intention) const override;
+    bool IsValidDataDir(std::filesystem::path const &dataDir, Intention::Enum intention) const override;
 
-    ITorrentStateIteratorPtr Export(std::filesystem::path const& dataDir,
-        IFileStreamProvider const& fileStreamProvider) const override;
-    void Import(std::filesystem::path const& dataDir, Box const& box, IFileStreamProvider& fileStreamProvider) const override;
+    ITorrentStateIteratorPtr Export(std::filesystem::path const &dataDir, IFileStreamProvider const &fileStreamProvider) const override;
+    void Import(std::filesystem::path const &dataDir, Box const &box, IFileStreamProvider &fileStreamProvider) const override;
 
-private:
+   private:
     TransmissionStateType const m_stateType;
     BencodeCodec const m_bencoder;
     std::mutex mutable m_tranfersPlistMutex;

@@ -19,63 +19,48 @@
 #include "Common/Exception.h"
 #include "Common/Util.h"
 
-namespace ClientName
-{
+namespace ClientName {
 
-std::string const Deluge = "Deluge";
-std::string const rTorrent = "rTorrent";
-std::string const Transmission = "Transmission";
-std::string const TransmissionMac = "TransmissionMac";
-std::string const uTorrent = "uTorrent";
-std::string const uTorrentWeb = "uTorrentWeb";
+    std::string const Deluge = "Deluge";
+    std::string const rTorrent = "rTorrent";
+    std::string const Transmission = "Transmission";
+    std::string const TransmissionMac = "TransmissionMac";
+    std::string const uTorrent = "uTorrent";
+    std::string const uTorrentWeb = "uTorrentWeb";
 
-} // namespace
+}  // namespace ClientName
 
-std::string TorrentClient::ToString(Enum client)
-{
-    switch (client)
-    {
-    case Deluge:
-        return ClientName::Deluge;
-    case rTorrent:
-        return ClientName::rTorrent;
-    case Transmission:
-        return ClientName::Transmission;
-    case TransmissionMac:
-        return ClientName::TransmissionMac;
-    case uTorrent:
-        return ClientName::uTorrent;
-    case uTorrentWeb:
-        return ClientName::uTorrentWeb;
+std::string TorrentClient::ToString(Enum client) {
+    switch (client) {
+        case Deluge:
+            return ClientName::Deluge;
+        case rTorrent:
+            return ClientName::rTorrent;
+        case Transmission:
+            return ClientName::Transmission;
+        case TransmissionMac:
+            return ClientName::TransmissionMac;
+        case uTorrent:
+            return ClientName::uTorrent;
+        case uTorrentWeb:
+            return ClientName::uTorrentWeb;
     }
 
     throw Exception("Unknown torrent client");
 }
 
-TorrentClient::Enum TorrentClient::FromString(std::string client)
-{
-    if (Util::IsEqualNoCase(client, ClientName::Deluge))
-    {
+TorrentClient::Enum TorrentClient::FromString(std::string client) {
+    if (Util::IsEqualNoCase(client, ClientName::Deluge)) {
         return Deluge;
-    }
-    else if (Util::IsEqualNoCase(client, ClientName::rTorrent))
-    {
+    } else if (Util::IsEqualNoCase(client, ClientName::rTorrent)) {
         return rTorrent;
-    }
-    else if (Util::IsEqualNoCase(client, ClientName::Transmission))
-    {
+    } else if (Util::IsEqualNoCase(client, ClientName::Transmission)) {
         return Transmission;
-    }
-    else if (Util::IsEqualNoCase(client, ClientName::TransmissionMac))
-    {
+    } else if (Util::IsEqualNoCase(client, ClientName::TransmissionMac)) {
         return TransmissionMac;
-    }
-    else if (Util::IsEqualNoCase(client, ClientName::uTorrent))
-    {
+    } else if (Util::IsEqualNoCase(client, ClientName::uTorrent)) {
         return uTorrent;
-    }
-    else if (Util::IsEqualNoCase(client, ClientName::uTorrentWeb))
-    {
+    } else if (Util::IsEqualNoCase(client, ClientName::uTorrentWeb)) {
         return uTorrentWeb;
     }
 

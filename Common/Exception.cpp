@@ -16,22 +16,15 @@
 
 #include "Exception.h"
 
-Exception::Exception(std::string const& message) :
-    m_message(message)
-{
+Exception::Exception(std::string const &message) : m_message(message) {
     //
 }
 
-char const* Exception::what() const noexcept
-{
-    return m_message.c_str();
-}
+char const *Exception::what() const noexcept { return m_message.c_str(); }
 
 Exception::~Exception() = default;
 
-NotImplementedException::NotImplementedException(std::string const& place) :
-    Exception("Not implemented: " + place)
-{
+NotImplementedException::NotImplementedException(std::string const &place) : Exception("Not implemented: " + place) {
     //
 }
 

@@ -16,9 +16,6 @@
 
 #include "MigrationTransaction.h"
 
-#include "Common/Exception.h"
-#include "Common/Logger.h"
-
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <fmt/std.h>
@@ -29,36 +26,29 @@
 #include <locale>
 #include <sstream>
 
+#include "Common/Exception.h"
+#include "Common/Logger.h"
+
 namespace fs = std::filesystem;
 
-MigrationTransaction::MigrationTransaction(bool writeThrough, bool dryRun) :
-    m_writeThrough(writeThrough),
-    m_dryRun(dryRun),
-    m_transactionId(fmt::format("{:%FT%T%z}", std::chrono::system_clock::now())),
-    m_safePaths(),
-    m_safePathsMutex()
-{
+MigrationTransaction::MigrationTransaction(bool writeThrough, bool dryRun)
+    : m_writeThrough(writeThrough), m_dryRun(dryRun), m_transactionId(fmt::format("{:%FT%T%z}", std::chrono::system_clock::now())), m_safePaths(), m_safePathsMutex() {
     //
 }
 
-MigrationTransaction::~MigrationTransaction() noexcept(false)
-{
-    if (m_writeThrough || m_dryRun)
-    {
+MigrationTransaction::~MigrationTransaction() noexcept(false) {
+    if (m_writeThrough || m_dryRun) {
         return;
     }
 
-    if (m_safePaths.empty())
-    {
+    if (m_safePaths.empty()) {
         return;
     }
 
     Logger(Logger::Info) << "Reverting changes";
 
-    for (fs::path const& safePath : m_safePaths)
-    {
-        if (!fs::exists(safePath) && fs::exists(GetBackupPath(safePath)))
-        {
+    for (fs::path const &safePath : m_safePaths) {
+        if (!fs::exists(safePath) && fs::exists(GetBackupPath(safePath))) {
             fs::rename(GetBackupPath(safePath), safePath);
         }
 
@@ -66,19 +56,15 @@ MigrationTransaction::~MigrationTransaction() noexcept(false)
     }
 }
 
-void MigrationTransaction::Commit()
-{
-    if (m_writeThrough || m_dryRun)
-    {
+void MigrationTransaction::Commit() {
+    if (m_writeThrough || m_dryRun) {
         return;
     }
 
     Logger(Logger::Info) << "Committing changes";
 
-    for (fs::path const& safePath : m_safePaths)
-    {
-        if (fs::exists(safePath))
-        {
+    for (fs::path const &safePath : m_safePaths) {
+        if (fs::exists(safePath)) {
             fs::rename(safePath, GetBackupPath(safePath));
         }
 
@@ -88,32 +74,24 @@ void MigrationTransaction::Commit()
     m_safePaths.clear();
 }
 
-IReadStreamPtr MigrationTransaction::GetReadStream(fs::path const& path) const
-{
+IReadStreamPtr MigrationTransaction::GetReadStream(fs::path const &path) const {
     auto result = std::make_unique<std::ifstream>();
     result->exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
-    try
-    {
-        if (m_safePaths.find(path) != m_safePaths.end())
-        {
+    try {
+        if (m_safePaths.find(path) != m_safePaths.end()) {
             result->open(GetTemporaryPath(path), std::ios_base::in | std::ios_base::binary);
-        }
-        else
-        {
+        } else {
             result->open(path, std::ios_base::in | std::ios_base::binary);
         }
-    }
-    catch (std::exception const&)
-    {
+    } catch (std::exception const &) {
         throw Exception(fmt::format("Unable to open file for reading: {}", path));
     }
 
     return result;
 }
 
-IWriteStreamPtr MigrationTransaction::GetWriteStream(fs::path const& path)
-{
+IWriteStreamPtr MigrationTransaction::GetWriteStream(fs::path const &path) {
     static std::string const BlackHoleFilename =
 #ifdef _WIN32
         "nul";
@@ -124,41 +102,31 @@ IWriteStreamPtr MigrationTransaction::GetWriteStream(fs::path const& path)
     auto result = std::make_unique<std::ofstream>();
     result->exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
-    try
-    {
-        if (m_dryRun)
-        {
+    try {
+        if (m_dryRun) {
             result->open(BlackHoleFilename, std::ios_base::out | std::ios_base::binary);
-        }
-        else if (m_writeThrough)
-        {
+        } else if (m_writeThrough) {
             result->open(path, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
-        }
-        else
-        {
+        } else {
             std::lock_guard<std::mutex> lock(m_safePathsMutex);
 
             result->open(GetTemporaryPath(path), std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
             m_safePaths.insert(path);
         }
-    }
-    catch (std::exception const&)
-    {
+    } catch (std::exception const &) {
         throw Exception(fmt::format("Unable to open file for writing: {}", path));
     }
 
     return result;
 }
 
-fs::path MigrationTransaction::GetTemporaryPath(fs::path const& path) const
-{
+fs::path MigrationTransaction::GetTemporaryPath(fs::path const &path) const {
     fs::path result = path;
     result += ".tmp." + m_transactionId;
     return result;
 }
 
-fs::path MigrationTransaction::GetBackupPath(fs::path const& path) const
-{
+fs::path MigrationTransaction::GetBackupPath(fs::path const &path) const {
     fs::path result = path;
     result += ".bak." + m_transactionId;
     return result;

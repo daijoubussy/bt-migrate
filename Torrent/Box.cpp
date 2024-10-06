@@ -16,36 +16,30 @@
 
 #include "Box.h"
 
-Box::LimitInfo::LimitInfo() :
-    Mode(LimitMode::Inherit),
-    Value(0)
-{
+Box::LimitInfo::LimitInfo() : Mode(LimitMode::Inherit), Value(0) {
     //
 }
 
-Box::FileInfo::FileInfo() :
-    DoNotDownload(false),
-    Priority(0)
-{
+Box::FileInfo::FileInfo() : DoNotDownload(false), Priority(0) {
     //
 }
 
-Box::Box() :
-    Torrent(),
-    AddedAt(0),
-    CompletedAt(0),
-    IsPaused(false),
-    DownloadedSize(0),
-    UploadedSize(0),
-    CorruptedSize(0),
-    SavePath(),
-    BlockSize(0),
-    RatioLimit(),
-    DownloadSpeedLimit(),
-    UploadSpeedLimit(),
-    Files(),
-    ValidBlocks(),
-    Trackers()
-{
+Box::Box()
+    : Ignore(false),
+      Torrent(),
+      AddedAt(0),
+      CompletedAt(0),
+      IsPaused(false),
+      DownloadedSize(0),
+      UploadedSize(0),
+      CorruptedSize(0),
+      SavePath(),
+      BlockSize(0),
+      RatioLimit(),
+      DownloadSpeedLimit(),
+      UploadSpeedLimit(),
+      Files(),
+      ValidBlocks(),
+      Trackers() {
     //
 }

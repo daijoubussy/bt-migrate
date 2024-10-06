@@ -16,20 +16,19 @@
 
 #pragma once
 
-class SignalHandler
-{
+class SignalHandler {
     typedef void (*HandlerType)(int);
 
-public:
+   public:
     SignalHandler();
     ~SignalHandler();
 
-    SignalHandler(SignalHandler const& other) = delete;
-    SignalHandler& operator = (SignalHandler const& other) = delete;
+    SignalHandler(SignalHandler const &other) = delete;
+    SignalHandler &operator=(SignalHandler const &other) = delete;
 
     bool IsInterrupted() const;
 
-private:
+   private:
     HandlerType const m_oldIntHandler;
     HandlerType const m_oldTermHandler;
 };

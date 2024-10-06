@@ -16,20 +16,19 @@
 
 #pragma once
 
-#include "Torrent/Intention.h"
-#include "Torrent/TorrentClient.h"
-
 #include <filesystem>
 #include <memory>
+
+#include "Torrent/Intention.h"
+#include "Torrent/TorrentClient.h"
 
 class ITorrentStateStore;
 typedef std::unique_ptr<ITorrentStateStore> ITorrentStateStorePtr;
 
-class TorrentStateStoreFactory
-{
-public:
+class TorrentStateStoreFactory {
+   public:
     TorrentStateStoreFactory();
 
     ITorrentStateStorePtr CreateForClient(TorrentClient::Enum client) const;
-    ITorrentStateStorePtr GuessByDataDir(std::filesystem::path const& dataDir, Intention::Enum intention) const;
+    ITorrentStateStorePtr GuessByDataDir(std::filesystem::path const &dataDir, Intention::Enum intention) const;
 };

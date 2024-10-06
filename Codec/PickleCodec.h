@@ -18,14 +18,13 @@
 
 #include "IStructuredDataCodec.h"
 
-class PickleCodec : public IStructuredDataCodec
-{
-public:
+class PickleCodec : public IStructuredDataCodec {
+   public:
     PickleCodec();
     ~PickleCodec() override;
 
-public:
+   public:
     // IStructuredDataCodec
-    void Decode(std::istream& stream, ojson& root) const override;
-    void Encode(std::ostream& stream, ojson const& root) const override;
+    void Decode(std::istream &stream, ojson &root) const override;
+    void Encode(std::ostream &stream, ojson const &root) const override;
 };

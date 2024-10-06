@@ -20,10 +20,8 @@
 
 struct Box;
 
-struct BoxHelper
-{
-    struct Priority
-    {
+struct BoxHelper {
+    struct Priority {
         static int FromStore(int storeValue, int storeMinValue, int storeMaxValue);
         static int ToStore(int boxValue, int storeMinValue, int storeMaxValue);
     };

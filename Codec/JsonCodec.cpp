@@ -21,12 +21,6 @@
 JsonCodec::JsonCodec() = default;
 JsonCodec::~JsonCodec() = default;
 
-void JsonCodec::Decode(std::istream& stream, ojson& root) const
-{
-    stream >> root;
-}
+void JsonCodec::Decode(std::istream& stream, ojson& root) const { stream >> root; }
 
-void JsonCodec::Encode(std::ostream& stream, ojson const& root) const
-{
-    stream << root;
-}
+void JsonCodec::Encode(std::ostream& stream, ojson const& root) const { stream << root; }

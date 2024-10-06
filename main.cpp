@@ -14,27 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "ImportHelper.h"
-#include "MigrationTransaction.h"
-
-#include "Common/Exception.h"
-#include "Common/Logger.h"
-#include "Common/SignalHandler.h"
-#include "Store/ITorrentStateStore.h"
-#include "Store/TorrentStateStoreFactory.h"
-#include "Torrent/Box.h"
-
-#include <cxxopts.hpp>
 #include <fmt/format.h>
 #include <fmt/std.h>
 
 #include <algorithm>
 #include <csignal>
+#include <cxxopts.hpp>
 #include <exception>
 #include <filesystem>
 #include <iostream>
 #include <memory>
 #include <thread>
+
+#include "Common/Exception.h"
+#include "Common/Logger.h"
+#include "Common/SignalHandler.h"
+#include "ImportHelper.h"
+#include "MigrationTransaction.h"
+#include "Store/ITorrentStateStore.h"
+#include "Store/TorrentStateStoreFactory.h"
+#include "Torrent/Box.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -42,94 +41,76 @@
 
 namespace fs = std::filesystem;
 
-namespace
-{
+namespace {
 
-void PrintVersion()
-{
-    std::cout <<
-        "Torrent state migration tool, version " << BTMIGRATE_VERSION << std::endl <<
-        "Copyright (C) 2014-2021 Mike Gelfand <mikedld@mikedld.com>" << std::endl <<
-        std::endl <<
-        "This program comes with ABSOLUTELY NO WARRANTY. This is free software," << std::endl <<
-        "and you are welcome to redistribute it under certain conditions;" << std::endl <<
-        "see <http://www.gnu.org/licenses/gpl.html> for details." << std::endl;
-}
+    void PrintVersion() {
+        std::cout << "Torrent state migration tool, version " << BTMIGRATE_VERSION << std::endl
+                  << "Copyright (C) 2014-2021 Mike Gelfand <mikedld@mikedld.com>" << std::endl
+                  << std::endl
+                  << "This program comes with ABSOLUTELY NO WARRANTY. This is free "
+                     "software,"
+                  << std::endl
+                  << "and you are welcome to redistribute it under certain conditions;" << std::endl
+                  << "see <http://www.gnu.org/licenses/gpl.html> for details." << std::endl;
+    }
 
-void PrintUsage(cxxopts::Options const& options)
-{
-    std::cout << options.help();
-}
+    void PrintUsage(cxxopts::Options const &options) { std::cout << options.help(); }
 
-ITorrentStateStorePtr FindStateStore(TorrentStateStoreFactory const& storeFactory, Intention::Enum intention,
-    std::string& clientName, fs::path& clientDataDir)
-{
-    std::string const lowerCaseClientName = intention == Intention::Export ? "source" : "target";
-    std::string const upperCaseClientName = intention == Intention::Export ? "Source" : "Target";
+    ITorrentStateStorePtr FindStateStore(TorrentStateStoreFactory const &storeFactory, Intention::Enum intention, std::string &clientName, fs::path &clientDataDir) {
+        std::string const lowerCaseClientName = intention == Intention::Export ? "source" : "target";
+        std::string const upperCaseClientName = intention == Intention::Export ? "Source" : "Target";
 
-    ITorrentStateStorePtr result;
+        ITorrentStateStorePtr result;
 
-    if (!clientName.empty())
-    {
-        result = storeFactory.CreateForClient(TorrentClient::FromString(clientName));
-        if (clientDataDir.empty())
-        {
-            clientDataDir = result->GuessDataDir(intention);
-            if (clientDataDir.empty())
-            {
-                throw Exception(fmt::format("No data directory found for {} torrent client", lowerCaseClientName));
+        if (!clientName.empty()) {
+            result = storeFactory.CreateForClient(TorrentClient::FromString(clientName));
+            if (clientDataDir.empty()) {
+                clientDataDir = result->GuessDataDir(intention);
+                if (clientDataDir.empty()) {
+                    throw Exception(fmt::format("No data directory found for {} torrent client", lowerCaseClientName));
+                }
             }
+        } else if (!clientDataDir.empty()) {
+            result = storeFactory.GuessByDataDir(clientDataDir, intention);
+        } else {
+            throw Exception(fmt::format("{} torrent client name and/or data directory are not specified", upperCaseClientName));
         }
-    }
-    else if (!clientDataDir.empty())
-    {
-        result = storeFactory.GuessByDataDir(clientDataDir, intention);
-    }
-    else
-    {
-        throw Exception(fmt::format("{} torrent client name and/or data directory are not specified", upperCaseClientName));
-    }
 
-    clientName = TorrentClient::ToString(result->GetTorrentClient());
-    clientDataDir = fs::canonical(clientDataDir);
+        clientName = TorrentClient::ToString(result->GetTorrentClient());
+        clientDataDir = fs::canonical(clientDataDir);
 
-    if (!result->IsValidDataDir(clientDataDir, intention))
-    {
-        throw Exception(fmt::format("Bad {} data directory: {}", lowerCaseClientName, clientDataDir));
+        if (!result->IsValidDataDir(clientDataDir, intention)) {
+            throw Exception(fmt::format("Bad {} data directory: {}", lowerCaseClientName, clientDataDir));
+        }
+
+        Logger(Logger::Info) << upperCaseClientName << ": " << clientName << " (" << clientDataDir << ")";
+
+        return result;
     }
 
-    Logger(Logger::Info) << upperCaseClientName << ": " << clientName << " (" << clientDataDir << ")";
-
-    return result;
-}
-
-} // namespace
+}  // namespace
 
 #ifdef _WIN32
-int wmain(int argc, wchar_t* wideArgv[])
+int wmain(int argc, wchar_t *wideArgv[])
 #else
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 #endif
 {
-    try
-    {
+    try {
 #ifdef _WIN32
         auto argvStrings = std::vector<std::string>(argc);
-        auto argvCStrings = std::vector<char*>(argc);
-        char** const argv = argvCStrings.data();
+        auto argvCStrings = std::vector<char *>(argc);
+        char **const argv = argvCStrings.data();
 
-        for (int i = 0; i < argc; ++i)
-        {
+        for (int i = 0; i < argc; ++i) {
             int length = ::WideCharToMultiByte(CP_UTF8, 0, wideArgv[i], -1, nullptr, 0, nullptr, nullptr);
-            if (length != 0)
-            {
+            if (length != 0) {
                 argvStrings[i].resize(length);
                 argvCStrings[i] = argvStrings[i].data();
                 length = ::WideCharToMultiByte(CP_UTF8, 0, wideArgv[i], -1, argv[i], length, nullptr, nullptr);
             }
 
-            if (length == 0)
-            {
+            if (length == 0) {
                 throw Exception("Failed to parse Win32 command line");
             }
         }
@@ -148,38 +129,30 @@ int main(int argc, char* argv[])
 
         auto options = cxxopts::Options(programName);
 
-        options.add_options("Main")
-            ("source", "source client name", cxxopts::value<std::string>(sourceName), "name")
-            ("source-dir", "source client data directory", cxxopts::value<std::string>(sourceDirString), "path")
-            ("target", "target client name", cxxopts::value<std::string>(targetName), "name")
-            ("target-dir", "target client data directory", cxxopts::value<std::string>(targetDirString), "path")
-            ("max-threads", "maximum number of migration threads",
-                cxxopts::value<unsigned int>(maxThreads)->default_value(std::to_string(maxThreads)), "N")
-            ("no-backup", "do not backup target client data directory", cxxopts::value<bool>(noBackup))
-            ("dry-run", "do not write anything to disk", cxxopts::value<bool>(dryRun));
+        options.add_options("Main")("source", "source client name", cxxopts::value<std::string>(sourceName), "name")("source-dir", "source client data directory",
+                                                                                                                     cxxopts::value<std::string>(sourceDirString), "path")(
+            "target", "target client name", cxxopts::value<std::string>(targetName), "name")("target-dir", "target client data directory",
+                                                                                             cxxopts::value<std::string>(targetDirString), "path")(
+            "max-threads", "maximum number of migration threads", cxxopts::value<unsigned int>(maxThreads)->default_value(std::to_string(maxThreads)), "N")(
+            "no-backup", "do not backup target client data directory", cxxopts::value<bool>(noBackup))("dry-run", "do not write anything to disk", cxxopts::value<bool>(dryRun));
 
-        options.add_options("Other")
-            ("verbose", "produce verbose output", cxxopts::value<bool>(verboseOutput))
-            ("version", "print program version")
-            ("help", "print this help message");
+        options.add_options("Other")("verbose", "produce verbose output", cxxopts::value<bool>(verboseOutput))("version", "print program version")("help",
+                                                                                                                                                   "print this help message");
 
         auto const args = options.parse(argc, argv);
 
-        if (args.count("version") != 0)
-        {
+        if (args.count("version") != 0) {
             PrintVersion();
             return 0;
         }
 
-        if (args.count("help") != 0)
-        {
+        if (args.count("help") != 0) {
             PrintVersion();
             PrintUsage(options);
             return 0;
         }
 
-        if (verboseOutput)
-        {
+        if (verboseOutput) {
             Logger::SetMinimumLevel(Logger::Debug);
         }
 
@@ -196,41 +169,33 @@ int main(int argc, char* argv[])
 
         SignalHandler const signalHandler;
 
-        ImportHelper importHelper(std::move(sourceStore), sourceDir, std::move(targetStore), targetDir, transaction,
-            signalHandler);
+        ImportHelper importHelper(std::move(sourceStore), sourceDir, std::move(targetStore), targetDir, transaction, signalHandler);
         ImportHelper::Result const result = importHelper.Import(threadCount);
 
         bool shouldCommit = true;
 
-        if ((result.FailCount != 0 || result.SkipCount != 0) && !noBackup && !dryRun)
-        {
-            while (!signalHandler.IsInterrupted())
-            {
+        if ((result.FailCount != 0 || result.SkipCount != 0) && !noBackup && !dryRun) {
+            while (!signalHandler.IsInterrupted()) {
                 std::cout << "Import is not clean, do you want to commit? [yes/no]: " << std::flush;
 
                 std::string answer;
                 std::getline(std::cin, answer);
 
-                if (answer == "yes")
-                {
+                if (answer == "yes") {
                     break;
                 }
 
-                if (answer == "no")
-                {
+                if (answer == "no") {
                     shouldCommit = false;
                     break;
                 }
             }
         }
 
-        if (shouldCommit && !signalHandler.IsInterrupted())
-        {
+        if (shouldCommit && !signalHandler.IsInterrupted()) {
             transaction.Commit();
         }
-    }
-    catch (std::exception const& e)
-    {
+    } catch (std::exception const &e) {
         Logger(Logger::Error) << "Error: " << e.what();
         return 1;
     }

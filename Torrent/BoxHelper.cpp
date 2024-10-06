@@ -16,20 +16,18 @@
 
 #include "BoxHelper.h"
 
-#include "Box.h"
-
 #include <cmath>
 
-int BoxHelper::Priority::FromStore(int storeValue, int storeMinValue, int storeMaxValue)
-{
+#include "Box.h"
+
+int BoxHelper::Priority::FromStore(int storeValue, int storeMinValue, int storeMaxValue) {
     int const boxScaleSize = Box::MaxPriority - Box::MinPriority;
     int const storeScaleSize = storeMaxValue - storeMinValue;
     double const storeMiddleValue = storeMinValue + storeScaleSize / 2.;
     return std::lround(1. * (storeValue - storeMiddleValue) * boxScaleSize / storeScaleSize);
 }
 
-int BoxHelper::Priority::ToStore(int boxValue, int storeMinValue, int storeMaxValue)
-{
+int BoxHelper::Priority::ToStore(int boxValue, int storeMinValue, int storeMaxValue) {
     int const storeScaleSize = storeMaxValue - storeMinValue;
     int const boxScaleSize = Box::MaxPriority - Box::MinPriority;
     double const boxMiddleValue = double{Box::MinPriority} + boxScaleSize / 2.;

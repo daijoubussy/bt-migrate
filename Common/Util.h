@@ -16,32 +16,30 @@
 
 #pragma once
 
-#include <jsoncons/json.hpp>
-
 #include <filesystem>
+#include <jsoncons/json.hpp>
 #include <locale>
 #include <string>
 #include <string_view>
 
 using jsoncons::ojson;
 
-namespace Util
-{
+namespace Util {
 
-long long StringToInt(std::string const& text);
+    long long StringToInt(std::string const& text);
 
-std::filesystem::path GetPath(std::string_view nativePath);
+    std::filesystem::path GetPath(std::string_view nativePath);
 
-std::string CalculateSha1(std::string const& data);
+    std::string CalculateSha1(std::string const& data);
 
-std::string BinaryToHex(std::string const& data);
+    std::string BinaryToHex(std::string const& data);
 
-void SortJsonObjectKeys(ojson& object);
+    void SortJsonObjectKeys(ojson& object);
 
-std::string GetEnvironmentVariable(std::string const& name, std::string const& defaultValue);
+    std::string GetEnvironmentVariable(std::string const& name, std::string const& defaultValue);
 
-bool IsEqualNoCase(std::string_view lhs, std::string_view rhs, std::locale const& locale = {});
+    bool IsEqualNoCase(std::string_view lhs, std::string_view rhs, std::locale const& locale = {});
 
-std::string_view Trim(std::string_view text);
+    std::string_view Trim(std::string_view text);
 
-} // namespace Util
+}  // namespace Util

@@ -18,13 +18,12 @@
 
 #include "IStructuredDataCodec.h"
 
-class BencodeCodec : public IStructuredDataCodec
-{
-public:
+class BencodeCodec : public IStructuredDataCodec {
+   public:
     BencodeCodec();
     ~BencodeCodec() override;
 
-public:
+   public:
     // IStructuredDataCodec
     void Decode(std::istream& stream, ojson& root) const override;
     void Encode(std::ostream& stream, ojson const& root) const override;
